@@ -12,9 +12,9 @@ dotenv.config();
 const app = express();
 
 app.use((req, res, next) => {
-    res.header("Acess-Control-Allow-Origin", "*"); // Permite qualquer origem para req.
-    res.header("Acess-Control-Allow-Methods", "GET", "POST"); // Permite apenas métodos GET e POST
-    res.header("Acess-Control-Allow-Headers", "Content-Type"); // Permite o cabeçalho nas req.
+    res.header("Access-Control-Allow-Origin", "*"); // Permite qualquer origem para req.
+    res.header("Access-Control-Allow-Methods", "GET", "POST"); // Permite apenas métodos GET e POST
+    res.header("Access-Control-Allow-Headers", "Content-Type"); // Permite o cabeçalho nas req.
     next();
 });
 
@@ -31,6 +31,19 @@ app.get('/api/cep/:cep/json', async (req, res) => {
         res.json(response.data); // Retorna da API a resposta conforme o CEP
     } catch (error) {
         res.status(500).json({error: "Erro ao buscar o CEP!"}); // Em caso de erro
+    }
+});
+
+app.post('/api/address', async (req, res) => {
+    const { cep, logradouro, bairro, cidade, estado } = req.body;
+
+    try{
+        const newAddress = new Address ({ cep, logradouro, bairro, cidade, estado})
+        await newAddress.save() // Salva o endereço
+        res.status(201).json({ message: "Endereço salvo com sucesso!", data: newAddress});
+    } catch (error) {
+        // Retorna erro se não salvar 
+        res.status(500).json ({ error: "Erro ao salvar o endereço!"})
     }
 });
 
